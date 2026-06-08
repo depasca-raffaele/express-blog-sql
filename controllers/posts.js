@@ -67,19 +67,33 @@ export function update(request, response) {
     return response.status(200).json(posts[index]);
 }
 
-export function destroy(request, response) {
+export async function destroy(request, response) {
     const { id, isValid } = parseId(request.params.id);
 
     if (!isValid) {
         return response.status(400).json({ message: 'ID non valido' });
     }
 
-    const index = posts.findIndex((p) => p.id === id);
+    let connection;
 
-    if (index === -1) {
-        return response.status(404).json({ message: 'Post non trovato' });
+    try{
+        connection = await connectDB();
+
+        const [result] = await connection.query(
+            'DELETE FROM `posts` WHERE id = ?', [id]
+        );
+
+        if (result.affectedRows === 0) {
+            return response.status(404).json({ message: 'Post non trovato' });
+        }
+
+        return response.status(204).send();
+    }catch (error) {
+        console.error('Errore DESTROY DB', error.message);
+        return response.status(500).json({ message: 'Errore durante eliminazione post'});
+    }finally{
+        if(connection) {
+            await connection.end();
+        }
     }
-
-    const deleted = posts.splice(index, 1)[0];
-    return response.status(200).json({ message: 'Post eliminato', deleted });
 }

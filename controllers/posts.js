@@ -1,4 +1,5 @@
 import posts from '../data/posts.js';
+import { connectDB } from '../config/db.js';
 
 function parseId(rawId) {
     const id = Number(rawId);
@@ -6,8 +7,21 @@ function parseId(rawId) {
     return { id, isValid };
 }
 
-export function index(request, response) {
-    return response.status(200).json(posts);
+export async function index(request, response) {
+    let connection;
+    try {
+        connection = await connectDB();
+        const [rows] = await connection.query('SELECT * FROM \`posts\`');
+
+        return response.status(200).json(rows);
+    }catch (error) {
+        console.error('Errore INDEX DB:', error.message);
+        return response.status(500).json({message: 'Errore nel recupero dei post'});
+    }finally{
+        if(connection) {
+            await connection.end();
+        }
+    }
 }
 
 export function show(request, response) {

@@ -1,8 +1,13 @@
 import express from 'express';
 import postsRouter from './routers/posts.js';
 import posts from './data/posts.js';
+import { connectDB } from './config/db.js';
 
 const app = express();
+
+connectDB().catch(() => {
+    process.exit(1);
+});
 
 app.use(express.static('public'));
 app.use(express.json());

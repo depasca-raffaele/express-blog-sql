@@ -11,6 +11,9 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      sql2:
+        specifier: ^0.0.1
+        version: 0.0.1
 
 packages:
 
@@ -248,6 +251,9 @@ packages:
   side-channel@1.1.0:
     resolution: {integrity: sha512-ZX99e6tRweoUXqR+VBrslhda51Nh5MTQwou5tnUDgbtyM0dBgmhEDtWGP/xbKn6hqfPRHujUNwz5fy/wbbhnpw==}
     engines: {node: '>= 0.4'}
+
+  sql2@0.0.1:
+    resolution: {integrity: sha512-oLuKxrvDWPP5Dbe2395VGFzRSfc2QDm3gRjsHNsYZHCIvVeg92GKqRbp8FHdZRkAJ6bwdS1t9hFf/m1Dy319fw==}
 
   statuses@2.0.2:
     resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
@@ -551,6 +557,8 @@ snapshots:
       side-channel-list: 1.0.1
       side-channel-map: 1.0.1
       side-channel-weakmap: 1.0.2
+
+  sql2@0.0.1: {}
 
   statuses@2.0.2: {}
 

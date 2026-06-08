@@ -1,5 +1,6 @@
 import posts from '../data/posts.js';
 import { connectDB } from '../config/db.js';
+import { Connection } from 'mysql2';
 
 function parseId(rawId) {
     const id = Number(rawId);
@@ -24,20 +25,44 @@ export async function index(request, response) {
     }
 }
 
-export function show(request, response) {
+export async function show(request, response) {
     const { id, isValid } = parseId(request.params.id);
 
     if (!isValid) {
         return response.status(400).json({ message: 'ID non valido' });
     }
 
-    const post = posts.find((p) => p.id === id);
+    let connection;
 
-    if (!post) {
-        return response.status(404).json({ message: 'Post non trovato' });
+    try {
+        connection = await connectDB();
+
+        const [postRows] = await connection.query(
+            'SELECT * FROM `posts` WHERE id = ?', [id] 
+        );
+
+        if(postRows.length === 0){
+            return response.status(404).json({ message: 'Post non trovato' });
+        }
+
+        const post = postRows[0];
+
+        const [tagRows] = await connection.query(
+            'SELECT t.label FROM `tags` t INNER JOIN `post_tag` pt ON pt.tag_id = t.id WHERE pt.post_id = ?',
+            [id]
+        );
+
+        post.tags = tagRows.map((row) => row.label);
+
+        return response.status(200).json(post);
+    }catch (error) {
+        console.error('Errore SHOW DB:', error.message);
+        return response.status(500).json({ message: 'Errore nel recupero del post'});
+    }finally{
+        if (connection) {
+            await connection.end();
+        }
     }
-
-    return response.status(200).json(post);
 }
 
 export function create(request, response) {
